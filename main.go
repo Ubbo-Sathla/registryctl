@@ -45,7 +45,7 @@ func main() {
 				fmt.Println(err)
 			}
 			fmt.Println(tag, img)
-			newTag := fmt.Sprintf("10.12.49.246/vipdc-test/%s", tag)
+			newTag := fmt.Sprintf("10.12.49.246/test/%s", tag)
 			ref, _ := name.ParseReference(newTag, o.Name...)
 
 			fmt.Printf("%#v\n", ref)
