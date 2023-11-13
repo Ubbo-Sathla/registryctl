@@ -1,7 +1,9 @@
 package main
 
 import (
+	"flag"
 	"fmt"
+	"github.com/google/go-containerregistry/pkg/authn"
 	"github.com/google/go-containerregistry/pkg/crane"
 	"github.com/google/go-containerregistry/pkg/name"
 	v1 "github.com/google/go-containerregistry/pkg/v1"
@@ -11,20 +13,29 @@ import (
 	"os"
 )
 
+var image string
+
+func init() {
+	flag.StringVar(&image, "image", "", "docker image")
+	flag.Parse()
+}
 func pathOpener(path string) tarball.Opener {
 	return func() (io.ReadCloser, error) {
 		return os.Open(path)
 	}
 }
 func main() {
-	imgTar := "/tmp/registry.tar"
+	imgTar := image
 	fmt.Println("Hello world!")
 	manifests, err := tarball.LoadManifest(pathOpener(imgTar))
 	if err != nil {
 		fmt.Println(err)
 	}
 	fmt.Println(manifests)
-	o := crane.GetOptions()
+	o := crane.GetOptions(crane.Insecure, crane.WithAuth(authn.FromConfig(authn.AuthConfig{
+		Username: "he7",
+		Password: "Q6",
+	})))
 
 	for _, manifest := range manifests {
 		for _, tag := range manifest.RepoTags {
@@ -34,9 +45,11 @@ func main() {
 				fmt.Println(err)
 			}
 			fmt.Println(tag, img)
-			newTag := fmt.Sprintf("10.127.254.230:5000/library/%s", tag)
+			newTag := fmt.Sprintf("10.12.49.246/vipdc-test/%s", tag)
 			ref, _ := name.ParseReference(newTag, o.Name...)
+
 			fmt.Printf("%#v\n", ref)
+
 			var h v1.Hash
 			switch t := img.(type) {
 			case v1.Image:
